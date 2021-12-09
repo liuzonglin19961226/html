@@ -20,7 +20,7 @@
               type="text"
               :placeholder="$t('user.login.username.placeholder')"
               v-decorator="[
-                'username',
+                'loginName',
                 {rules: [{ required: true, message: $t('user.userName.required') }, { validator: handleUsernameOrEmail }], validateTrigger: 'change'}
               ]"
             >
@@ -33,7 +33,7 @@
               size="large"
               :placeholder="$t('user.login.password.placeholder')"
               v-decorator="[
-                'password',
+                'loginPassword',
                 {rules: [{ required: true, message: $t('user.password.required') }], validateTrigger: 'blur'}
               ]"
             >
@@ -114,11 +114,11 @@
 </template>
 
 <script>
-import md5 from 'md5'
+// import md5 from 'md5'
+import { ACCESS_TOKEN } from '@/store/mutation-types'
 import TwoStepCaptcha from '@/components/tools/TwoStepCaptcha'
-import { mapActions } from 'vuex'
-import { timeFix } from '@/utils/util'
-import { getSmsCaptcha, get2step } from '@/api/login'
+import { getSmsCaptcha, get2step, login } from '@/api/login'
+import store from '@/store'
 
 export default {
   components: {
@@ -154,7 +154,6 @@ export default {
     // this.requiredTwoStepCaptcha = true
   },
   methods: {
-    ...mapActions(['Login', 'Logout']),
     // handler
     handleUsernameOrEmail (rule, value, callback) {
       const { state } = this
@@ -175,23 +174,31 @@ export default {
       const {
         form: { validateFields },
         state,
-        customActiveKey,
-        Login
+        customActiveKey
       } = this
 
       state.loginBtn = true
 
-      const validateFieldsKey = customActiveKey === 'tab1' ? ['username', 'password'] : ['mobile', 'captcha']
+      const validateFieldsKey = customActiveKey === 'tab1' ? ['loginName', 'loginPassword'] : ['mobile', 'captcha']
 
       validateFields(validateFieldsKey, { force: true }, (err, values) => {
         if (!err) {
           console.log('login form', values)
           const loginParams = { ...values }
-          delete loginParams.username
-          loginParams[!state.loginType ? 'email' : 'username'] = values.username
-          loginParams.password = md5(values.password)
-          Login(loginParams)
-            .then((res) => this.loginSuccess(res))
+          delete loginParams.loginName
+          loginParams[!state.loginType ? 'email' : 'loginName'] = values.loginName
+          // loginParams.password = md5(values.password)
+          loginParams.loginPassword = values.loginPassword
+          console.log(loginParams)
+          login(loginParams)
+            .then((res) => {
+                if (res.state === 'success') {
+                  this.loginSuccess(res)
+                } else {
+                  this.requestFailed(res.message)
+                }
+              }
+            )
             .catch(err => this.requestFailed(err))
             .finally(() => {
               state.loginBtn = false
@@ -248,32 +255,31 @@ export default {
     },
     loginSuccess (res) {
       console.log(res)
+      store.set(ACCESS_TOKEN, res.data.id)
       // check res.homePage define, set $router.push name res.homePage
       // Why not enter onComplete
-      /*
       this.$router.push({ name: 'analysis' }, () => {
         console.log('onComplete')
         this.$notification.success({
           message: '欢迎',
-          description: `${timeFix()}，欢迎回来`
+          description: `欢迎回来`
         })
       })
-      */
-      this.$router.push({ path: '/' })
-      // 延迟 1 秒显示欢迎信息
-      setTimeout(() => {
-        this.$notification.success({
-          message: '欢迎',
-          description: `${timeFix()}，欢迎回来`
-        })
-      }, 1000)
+      // this.$router.push({ path: '/' })
+      // // 延迟 1 秒显示欢迎信息
+      // setTimeout(() => {
+      //   this.$notification.success({
+      //     message: '欢迎',
+      //     description: `${timeFix()}，欢迎回来`
+      //   })
+      // }, 1000)
       this.isLoginError = false
     },
     requestFailed (err) {
       this.isLoginError = true
       this.$notification['error']({
         message: '错误',
-        description: ((err.response || {}).data || {}).message || '请求出现错误，请稍后再试',
+        description: err,
         duration: 4
       })
     }
