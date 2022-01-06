@@ -35,6 +35,10 @@ export default {
       type: Number,
       default: 10
     },
+    options: {
+      type: Array,
+      default: ()=> ['10','20','30','40']
+    },
     showSizeChanger: {
       type: Boolean,
       default: true
@@ -116,7 +120,8 @@ export default {
     this.localPagination = ['auto', true].includes(this.showPagination) && Object.assign({}, this.localPagination, {
       current: localPageNum,
       pageSize: this.pageSize,
-      showSizeChanger: this.showSizeChanger
+      showSizeChanger: this.showSizeChanger,
+      pageSizeOptions: this.options
     }) || false
     this.needTotalList = this.initTotalList(this.columns)
     this.loadData()

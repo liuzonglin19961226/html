@@ -8,6 +8,7 @@ import cloneDeep from 'lodash.clonedeep'
  * @param route
  * @returns {boolean}
  */
+// eslint-disable-next-line no-unused-vars
 function hasPermission (permission, route) {
   if (route.meta && route.meta.permission) {
     let flag = false
@@ -40,13 +41,18 @@ function hasRole(roles, route) {
 
 function filterAsyncRouter (routerMap, roles) {
   const accessedRouters = routerMap.filter(route => {
-    if (hasPermission(roles.permissionList, route)) {
-      if (route.children && route.children.length) {
-        route.children = filterAsyncRouter(route.children, roles)
-      }
-      return true
+    /* 去除了菜单权限过滤 */
+    // if (hasPermission(roles.permissionList, route)) {
+    //   if (route.children && route.children.length) {
+    //     route.children = filterAsyncRouter(route.children, roles)
+    //   }
+    //   return true
+    // }
+    // return false
+    if (route.children && route.children.length) {
+      route.children = filterAsyncRouter(route.children, roles)
     }
-    return false
+    return true
   })
   return accessedRouters
 }

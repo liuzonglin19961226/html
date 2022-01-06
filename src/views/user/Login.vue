@@ -13,7 +13,7 @@
         @change="handleTabClick"
       >
         <a-tab-pane key="tab1" :tab="$t('user.login.tab-login-credentials')">
-          <a-alert v-if="isLoginError" type="error" showIcon style="margin-bottom: 24px;" :message="$t('user.login.message-invalid-credentials')" />
+          <a-alert v-if="isLoginError" type="error" showIcon style="margin-bottom: 24px;" :message="errorMsg" />
           <a-form-item>
             <a-input
               size="large"
@@ -115,10 +115,9 @@
 
 <script>
 // import md5 from 'md5'
-import { ACCESS_TOKEN } from '@/store/mutation-types'
+import { mapActions } from 'vuex'
 import TwoStepCaptcha from '@/components/tools/TwoStepCaptcha'
-import { getSmsCaptcha, get2step, login } from '@/api/login'
-import store from '@/store'
+import { getSmsCaptcha, get2step } from '@/api/login'
 
 export default {
   components: {
@@ -140,7 +139,8 @@ export default {
         // login type: 0 email, 1 username, 2 telephone
         loginType: 0,
         smsSendBtn: false
-      }
+      },
+      errorMsg: ''
     }
   },
   created () {
@@ -154,6 +154,7 @@ export default {
     // this.requiredTwoStepCaptcha = true
   },
   methods: {
+    ...mapActions(['Login', 'Logout']),
     // handler
     handleUsernameOrEmail (rule, value, callback) {
       const { state } = this
@@ -174,7 +175,8 @@ export default {
       const {
         form: { validateFields },
         state,
-        customActiveKey
+        customActiveKey,
+        Login
       } = this
 
       state.loginBtn = true
@@ -189,17 +191,15 @@ export default {
           loginParams[!state.loginType ? 'email' : 'loginName'] = values.loginName
           // loginParams.password = md5(values.password)
           loginParams.loginPassword = values.loginPassword
-          console.log(loginParams)
-          login(loginParams)
+          Login(loginParams)
             .then((res) => {
-                if (res.state === 'success') {
-                  this.loginSuccess(res)
-                } else {
-                  this.requestFailed(res.message)
-                }
+                this.loginSuccess(res)
               }
             )
-            .catch(err => this.requestFailed(err))
+            .catch(err => {
+              this.errorMsg = err
+              this.requestFailed(err)
+            })
             .finally(() => {
               state.loginBtn = false
             })
@@ -254,11 +254,9 @@ export default {
       })
     },
     loginSuccess (res) {
-      console.log(res)
-      store.set(ACCESS_TOKEN, res.data.id)
       // check res.homePage define, set $router.push name res.homePage
       // Why not enter onComplete
-      this.$router.push({ name: 'analysis' }, () => {
+      this.$router.push({ name: '/' }, () => {
         console.log('onComplete')
         this.$notification.success({
           message: '欢迎',
@@ -275,7 +273,7 @@ export default {
       // }, 1000)
       this.isLoginError = false
     },
-    requestFailed (err) {
+     requestFailed (err) {
       this.isLoginError = true
       this.$notification['error']({
         message: '错误',

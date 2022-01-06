@@ -45,13 +45,13 @@ const SelectLang = {
         ))}
       </Menu>
     )
-    return (
+   /* return (
       <Dropdown overlay={langMenu} placement="bottomRight">
         <span class={prefixCls}>
           <Icon type="global" title={i18nRender('navBar.lang')} />
         </span>
       </Dropdown>
-    )
+    )*/
   }
 }
 
