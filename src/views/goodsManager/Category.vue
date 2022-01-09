@@ -158,7 +158,6 @@
           insertFlag:false,
           updateValue:'',
           insertValue:'',
-          loading:false,
           isSearch:false,
           // create model
           visible: false,
@@ -192,7 +191,8 @@
             })
         },
         selectTree(value,e) {
-          this.categoryName = e.eventKey
+          console.log(e)
+          this.categoryName = e.title
           this.categoryID = value
         },
         updateCategory(){

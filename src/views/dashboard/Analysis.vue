@@ -2,15 +2,15 @@
   <div>
     <a-row :gutter="24">
       <a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">
-        <chart-card :loading="loading" :title="$t('dashboard.analysis.total-sales')" total="￥126,560">
+        <chart-card :loading="loading" title="昨日销售额" total="￥126,560">
           <a-tooltip :title="$t('dashboard.analysis.introduce')" slot="action">
             <a-icon type="info-circle-o" />
           </a-tooltip>
           <div>
-            <trend flag="up" style="margin-right: 16px;">
+            <!--<trend flag="up" style="margin-right: 16px;">
               <span slot="term">{{ $t('dashboard.analysis.week') }}</span>
               12%
-            </trend>
+            </trend>-->
             <trend flag="down">
               <span slot="term">{{ $t('dashboard.analysis.day') }}</span>
               11%
@@ -20,28 +20,50 @@
         </chart-card>
       </a-col>
       <a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">
-        <chart-card :loading="loading" :title="$t('dashboard.analysis.visits')" :total="8846 | NumberFormat">
+        <chart-card :loading="loading" title="昨日卖出总数" :total="130 | NumberFormat">
           <a-tooltip :title="$t('dashboard.analysis.introduce')" slot="action">
             <a-icon type="info-circle-o" />
           </a-tooltip>
           <div>
-            <mini-area />
+            <mini-area
+              :data="saleNumber"
+            />
           </div>
-          <template slot="footer">{{ $t('dashboard.analysis.day-visits') }}<span> {{ '1234' | NumberFormat }}</span></template>
+          <template slot="footer">日平均卖出总数<span> {{ '124' | NumberFormat }}</span></template>
         </chart-card>
       </a-col>
       <a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">
-        <chart-card :loading="loading" :title="$t('dashboard.analysis.payments')" :total="6560 | NumberFormat">
+        <chart-card :loading="loading" :title="$t('dashboard.analysis.payments')" :total="30 | NumberFormat">
           <a-tooltip :title="$t('dashboard.analysis.introduce')" slot="action">
             <a-icon type="info-circle-o" />
           </a-tooltip>
           <div>
-            <mini-bar />
+            <mini-bar
+              :data="orderPay"
+            />
           </div>
-          <template slot="footer">{{ $t('dashboard.analysis.conversion-rate') }} <span>60%</span></template>
+          <template slot="footer">{{ $t('dashboard.analysis.conversion-rate') }} <span>100%</span></template>
         </chart-card>
       </a-col>
       <a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">
+        <chart-card :loading="loading" title="昨日进货额" total="￥50,000">
+          <a-tooltip :title="$t('dashboard.analysis.introduce')" slot="action">
+            <a-icon type="info-circle-o" />
+          </a-tooltip>
+          <div>
+            <!--<trend flag="up" style="margin-right: 16px;">
+              <span slot="term">{{ $t('dashboard.analysis.week') }}</span>
+              12%
+            </trend>-->
+            <trend flag="down">
+              <span slot="term">{{ $t('dashboard.analysis.day') }}</span>
+              11%
+            </trend>
+          </div>
+          <template slot="footer">日均进货额<span>￥ 234.56</span></template>
+        </chart-card>
+      </a-col>
+      <!--<a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">
         <chart-card :loading="loading" :title="$t('dashboard.analysis.operational-effect')" total="78%">
           <a-tooltip :title="$t('dashboard.analysis.introduce')" slot="action">
             <a-icon type="info-circle-o" />
@@ -60,7 +82,7 @@
             </trend>
           </template>
         </chart-card>
-      </a-col>
+      </a-col>-->
     </a-row>
 
     <a-card :loading="loading" :bordered="false" :body-style="{padding: '0'}">
@@ -68,10 +90,10 @@
         <a-tabs default-active-key="1" size="large" :tab-bar-style="{marginBottom: '24px', paddingLeft: '16px'}">
           <div class="extra-wrapper" slot="tabBarExtraContent">
             <div class="extra-item">
-              <a>{{ $t('dashboard.analysis.all-day') }}</a>
-              <a>{{ $t('dashboard.analysis.all-week') }}</a>
-              <a>{{ $t('dashboard.analysis.all-month') }}</a>
-              <a>{{ $t('dashboard.analysis.all-year') }}</a>
+              <a @click="searchRankList('day')">{{ $t('dashboard.analysis.all-day') }}</a>
+              <a @click="searchRankList('week')">{{ $t('dashboard.analysis.all-week') }}</a>
+              <a @click="searchRankList('month')">{{ $t('dashboard.analysis.all-month') }}</a>
+              <a @click="searchRankList('year')">{{ $t('dashboard.analysis.all-year') }}</a>
             </div>
             <a-range-picker :style="{width: '256px'}" />
           </div>
@@ -81,11 +103,11 @@
                 <bar :data="barData" :title="$t('dashboard.analysis.sales-trend')" />
               </a-col>
               <a-col :xl="8" :lg="12" :md="12" :sm="24" :xs="24">
-                <rank-list :title="$t('dashboard.analysis.sales-ranking')" :list="rankList"/>
+                <rank-list title="菜品出售排名" :list="rankList"/>
               </a-col>
             </a-row>
           </a-tab-pane>
-          <a-tab-pane :tab="$t('dashboard.analysis.visits')" key="2">
+          <!--<a-tab-pane :tab="$t('dashboard.analysis.visits')" key="2">
             <a-row>
               <a-col :xl="16" :lg="12" :md="12" :sm="24" :xs="24">
                 <bar :data="barData2" :title="$t('dashboard.analysis.visits-trend')" />
@@ -94,219 +116,126 @@
                 <rank-list :title="$t('dashboard.analysis.visits-ranking')" :list="rankList"/>
               </a-col>
             </a-row>
-          </a-tab-pane>
+          </a-tab-pane>-->
         </a-tabs>
       </div>
     </a-card>
 
-    <div class="antd-pro-pages-dashboard-analysis-twoColLayout" :class="!isMobile && 'desktop'">
-      <a-row :gutter="24" type="flex" :style="{ marginTop: '24px' }">
-        <a-col :xl="12" :lg="24" :md="24" :sm="24" :xs="24">
-          <a-card :loading="loading" :bordered="false" :title="$t('dashboard.analysis.online-top-search')" :style="{ height: '100%' }">
-            <a-dropdown :trigger="['click']" placement="bottomLeft" slot="extra">
-              <a class="ant-dropdown-link" href="#">
-                <a-icon type="ellipsis" />
-              </a>
-              <a-menu slot="overlay">
-                <a-menu-item>
-                  <a href="javascript:;">{{ $t('dashboard.analysis.dropdown-option-one') }}</a>
-                </a-menu-item>
-                <a-menu-item>
-                  <a href="javascript:;">{{ $t('dashboard.analysis.dropdown-option-two') }}</a>
-                </a-menu-item>
-              </a-menu>
-            </a-dropdown>
-            <a-row :gutter="68">
-              <a-col :xs="24" :sm="12" :style="{ marginBottom: ' 24px'}">
-                <number-info :total="12321" :sub-total="17.1">
-                  <span slot="subtitle">
-                    <span>{{ $t('dashboard.analysis.search-users') }}</span>
-                    <a-tooltip :title="$t('dashboard.analysis.introduce')" slot="action">
-                      <a-icon type="info-circle-o" :style="{ marginLeft: '8px' }" />
-                    </a-tooltip>
-                  </span>
-                </number-info>
-                <!-- miniChart -->
-                <div>
-                  <mini-smooth-area :style="{ height: '45px' }" :dataSource="searchUserData" :scale="searchUserScale" />
-                </div>
-              </a-col>
-              <a-col :xs="24" :sm="12" :style="{ marginBottom: ' 24px'}">
-                <number-info :total="2.7" :sub-total="26.2" status="down">
-                  <span slot="subtitle">
-                    <span>{{ $t('dashboard.analysis.per-capita-search') }}</span>
-                    <a-tooltip :title="$t('dashboard.analysis.introduce')" slot="action">
-                      <a-icon type="info-circle-o" :style="{ marginLeft: '8px' }" />
-                    </a-tooltip>
-                  </span>
-                </number-info>
-                <!-- miniChart -->
-                <div>
-                  <mini-smooth-area :style="{ height: '45px' }" :dataSource="searchUserData" :scale="searchUserScale" />
-                </div>
-              </a-col>
-            </a-row>
-            <div class="ant-table-wrapper">
-              <a-table
-                row-key="index"
-                size="small"
-                :columns="searchTableColumns"
-                :dataSource="searchData"
-                :pagination="{ pageSize: 5 }"
-              >
-                <span slot="range" slot-scope="text, record">
-                  <trend :flag="record.status === 0 ? 'up' : 'down'">
-                    {{ text }}%
-                  </trend>
-                </span>
-              </a-table>
-            </div>
-          </a-card>
-        </a-col>
-        <a-col :xl="12" :lg="24" :md="24" :sm="24" :xs="24">
-          <a-card class="antd-pro-pages-dashboard-analysis-salesCard" :loading="loading" :bordered="false" :title="$t('dashboard.analysis.the-proportion-of-sales')" :style="{ height: '100%' }">
-            <div slot="extra" style="height: inherit;">
-              <!-- style="bottom: 12px;display: inline-block;" -->
-              <span class="dashboard-analysis-iconGroup">
-                <a-dropdown :trigger="['click']" placement="bottomLeft">
-                  <a-icon type="ellipsis" class="ant-dropdown-link" />
-                  <a-menu slot="overlay">
-                    <a-menu-item>
-                      <a href="javascript:;">{{ $t('dashboard.analysis.dropdown-option-one') }}</a>
-                    </a-menu-item>
-                    <a-menu-item>
-                      <a href="javascript:;">{{ $t('dashboard.analysis.dropdown-option-two') }}</a>
-                    </a-menu-item>
-                  </a-menu>
-                </a-dropdown>
-              </span>
-              <div class="analysis-salesTypeRadio">
-                <a-radio-group defaultValue="a">
-                  <a-radio-button value="a">{{ $t('dashboard.analysis.channel.all') }}</a-radio-button>
-                  <a-radio-button value="b">{{ $t('dashboard.analysis.channel.online') }}</a-radio-button>
-                  <a-radio-button value="c">{{ $t('dashboard.analysis.channel.stores') }}</a-radio-button>
-                </a-radio-group>
-              </div>
+    <!-- <div class="antd-pro-pages-dashboard-analysis-twoColLayout" :class="!isMobile && 'desktop'">
+       <a-row :gutter="24" type="flex" :style="{ marginTop: '24px' }">
+         <a-col :xl="12" :lg="24" :md="24" :sm="24" :xs="24">
+           <a-card :loading="loading" :bordered="false" :title="$t('dashboard.analysis.online-top-search')" :style="{ height: '100%' }">
+             <a-dropdown :trigger="['click']" placement="bottomLeft" slot="extra">
+               <a class="ant-dropdown-link" href="#">
+                 <a-icon type="ellipsis" />
+               </a>
+               <a-menu slot="overlay">
+                 <a-menu-item>
+                   <a href="javascript:;">{{ $t('dashboard.analysis.dropdown-option-one') }}</a>
+                 </a-menu-item>
+                 <a-menu-item>
+                   <a href="javascript:;">{{ $t('dashboard.analysis.dropdown-option-two') }}</a>
+                 </a-menu-item>
+               </a-menu>
+             </a-dropdown>
+             <a-row :gutter="68">
+               <a-col :xs="24" :sm="12" :style="{ marginBottom: ' 24px'}">
+                 <number-info :total="12321" :sub-total="17.1">
+                   <span slot="subtitle">
+                     <span>{{ $t('dashboard.analysis.search-users') }}</span>
+                     <a-tooltip :title="$t('dashboard.analysis.introduce')" slot="action">
+                       <a-icon type="info-circle-o" :style="{ marginLeft: '8px' }" />
+                     </a-tooltip>
+                   </span>
+                 </number-info>
+                 &lt;!&ndash; miniChart &ndash;&gt;
+                 <div>
+                   <mini-smooth-area :style="{ height: '45px' }" :dataSource="searchUserData" :scale="searchUserScale" />
+                 </div>
+               </a-col>
+               <a-col :xs="24" :sm="12" :style="{ marginBottom: ' 24px'}">
+                 <number-info :total="2.7" :sub-total="26.2" status="down">
+                   <span slot="subtitle">
+                     <span>{{ $t('dashboard.analysis.per-capita-search') }}</span>
+                     <a-tooltip :title="$t('dashboard.analysis.introduce')" slot="action">
+                       <a-icon type="info-circle-o" :style="{ marginLeft: '8px' }" />
+                     </a-tooltip>
+                   </span>
+                 </number-info>
+                 &lt;!&ndash; miniChart &ndash;&gt;
+                 <div>
+                   <mini-smooth-area :style="{ height: '45px' }" :dataSource="searchUserData" :scale="searchUserScale" />
+                 </div>
+               </a-col>
+             </a-row>
+             <div class="ant-table-wrapper">
+               <a-table
+                 row-key="index"
+                 size="small"
+                 :columns="searchTableColumns"
+                 :dataSource="searchData"
+                 :pagination="{ pageSize: 5 }"
+               >
+                 <span slot="range" slot-scope="text, record">
+                   <trend :flag="record.status === 0 ? 'up' : 'down'">
+                     {{ text }}%
+                   </trend>
+                 </span>
+               </a-table>
+             </div>
+           </a-card>
+         </a-col>
+         <a-col :xl="12" :lg="24" :md="24" :sm="24" :xs="24">
+           <a-card class="antd-pro-pages-dashboard-analysis-salesCard" :loading="loading" :bordered="false" :title="$t('dashboard.analysis.the-proportion-of-sales')" :style="{ height: '100%' }">
+             <div slot="extra" style="height: inherit;">
+               &lt;!&ndash; style="bottom: 12px;display: inline-block;" &ndash;&gt;
+               <span class="dashboard-analysis-iconGroup">
+                 <a-dropdown :trigger="['click']" placement="bottomLeft">
+                   <a-icon type="ellipsis" class="ant-dropdown-link" />
+                   <a-menu slot="overlay">
+                     <a-menu-item>
+                       <a href="javascript:;">{{ $t('dashboard.analysis.dropdown-option-one') }}</a>
+                     </a-menu-item>
+                     <a-menu-item>
+                       <a href="javascript:;">{{ $t('dashboard.analysis.dropdown-option-two') }}</a>
+                     </a-menu-item>
+                   </a-menu>
+                 </a-dropdown>
+               </span>
+               <div class="analysis-salesTypeRadio">
+                 <a-radio-group defaultValue="a">
+                   <a-radio-button value="a">{{ $t('dashboard.analysis.channel.all') }}</a-radio-button>
+                   <a-radio-button value="b">{{ $t('dashboard.analysis.channel.online') }}</a-radio-button>
+                   <a-radio-button value="c">{{ $t('dashboard.analysis.channel.stores') }}</a-radio-button>
+                 </a-radio-group>
+               </div>
 
-            </div>
-            <h4>{{ $t('dashboard.analysis.sales') }}</h4>
-            <div>
-              <!-- style="width: calc(100% - 240px);" -->
-              <div>
-                <v-chart :force-fit="true" :height="405" :data="pieData" :scale="pieScale">
-                  <v-tooltip :showTitle="false" dataKey="item*percent" />
-                  <v-axis />
-                  <!-- position="right" :offsetX="-140" -->
-                  <v-legend dataKey="item"/>
-                  <v-pie position="percent" color="item" :vStyle="pieStyle" />
-                  <v-coord type="theta" :radius="0.75" :innerRadius="0.6" />
-                </v-chart>
-              </div>
+             </div>
+             <h4>{{ $t('dashboard.analysis.sales') }}</h4>
+             <div>
+               &lt;!&ndash; style="width: calc(100% - 240px);" &ndash;&gt;
+               <div>
+                 <v-chart :force-fit="true" :height="405" :data="pieData" :scale="pieScale">
+                   <v-tooltip :showTitle="false" dataKey="item*percent" />
+                   <v-axis />
+                   &lt;!&ndash; position="right" :offsetX="-140" &ndash;&gt;
+                   <v-legend dataKey="item"/>
+                   <v-pie position="percent" color="item" :vStyle="pieStyle" />
+                   <v-coord type="theta" :radius="0.75" :innerRadius="0.6" />
+                 </v-chart>
+               </div>
 
-            </div>
-          </a-card>
-        </a-col>
-      </a-row>
-    </div>
+             </div>
+           </a-card>
+         </a-col>
+       </a-row>
+     </div>-->
   </div>
 </template>
 
 <script>
-import moment from 'moment'
-import {
-  ChartCard,
-  MiniArea,
-  MiniBar,
-  MiniProgress,
-  RankList,
-  Bar,
-  Trend,
-  NumberInfo,
-  MiniSmoothArea
-} from '@/components'
-import { baseMixin } from '@/store/app-mixin'
-
-const barData = []
-const barData2 = []
-for (let i = 0; i < 12; i += 1) {
-  barData.push({
-    x: `${i + 1}月`,
-    y: Math.floor(Math.random() * 1000) + 200
-  })
-  barData2.push({
-    x: `${i + 1}月`,
-    y: Math.floor(Math.random() * 1000) + 200
-  })
-}
-
-const rankList = []
-for (let i = 0; i < 7; i++) {
-  rankList.push({
-    name: '白鹭岛 ' + (i + 1) + ' 号店',
-    total: 1234.56 - i * 100
-  })
-}
-
-const searchUserData = []
-for (let i = 0; i < 7; i++) {
-  searchUserData.push({
-    x: moment().add(i, 'days').format('YYYY-MM-DD'),
-    y: Math.ceil(Math.random() * 10)
-  })
-}
-const searchUserScale = [
-  {
-    dataKey: 'x',
-    alias: '时间'
-  },
-  {
-    dataKey: 'y',
-    alias: '用户数',
-    min: 0,
-    max: 10
-  }]
-
-const searchData = []
-for (let i = 0; i < 50; i += 1) {
-  searchData.push({
-    index: i + 1,
-    keyword: `搜索关键词-${i}`,
-    count: Math.floor(Math.random() * 1000),
-    range: Math.floor(Math.random() * 100),
-    status: Math.floor((Math.random() * 10) % 2)
-  })
-}
-
-const DataSet = require('@antv/data-set')
-
-const sourceData = [
-  { item: '家用电器', count: 32.2 },
-  { item: '食用酒水', count: 21 },
-  { item: '个护健康', count: 17 },
-  { item: '服饰箱包', count: 13 },
-  { item: '母婴产品', count: 9 },
-  { item: '其他', count: 7.8 }
-]
-
-const pieScale = [{
-  dataKey: 'percent',
-  min: 0,
-  formatter: '.0%'
-}]
-
-const dv = new DataSet.View().source(sourceData)
-dv.transform({
-  type: 'percent',
-  field: 'count',
-  dimension: 'item',
-  as: 'percent'
-})
-const pieData = dv.rows
-
-export default {
-  name: 'Analysis',
-  mixins: [baseMixin],
-  components: {
+  import moment from 'moment'
+  import {
     ChartCard,
     MiniArea,
     MiniBar,
@@ -316,62 +245,170 @@ export default {
     Trend,
     NumberInfo,
     MiniSmoothArea
-  },
-  data () {
-    return {
-      loading: true,
-      rankList,
+  } from '@/components'
+  import { baseMixin } from '@/store/app-mixin'
 
-      // 搜索用户数
-      searchUserData,
-      searchUserScale,
-      searchData,
 
-      barData,
-      barData2,
 
-      //
-      pieScale,
-      pieData,
-      sourceData,
-      pieStyle: {
-        stroke: '#fff',
-        lineWidth: 1
-      }
-    }
-  },
-  computed: {
-    searchTableColumns () {
-        return [
-      {
-        dataIndex: 'index',
-        title: this.$t('dashboard.analysis.table.rank'),
-        width: 90
-      },
-      {
-        dataIndex: 'keyword',
-        title: this.$t('dashboard.analysis.table.search-keyword')
-      },
-      {
-        dataIndex: 'count',
-        title: this.$t('dashboard.analysis.table.users')
-      },
-      {
-        dataIndex: 'range',
-        title: this.$t('dashboard.analysis.table.weekly-range'),
-        align: 'right',
-        sorter: (a, b) => a.range - b.range,
-        scopedSlots: { customRender: 'range' }
-      }
-      ]
-    }
-  },
-  created () {
-    setTimeout(() => {
-      this.loading = !this.loading
-    }, 1000)
+  const searchUserData = []
+  for (let i = 0; i < 7; i++) {
+    searchUserData.push({
+      x: moment().add(i, 'days').format('YYYY-MM-DD'),
+      y: Math.ceil(Math.random() * 10)
+    })
   }
-}
+  const searchUserScale = [
+    {
+      dataKey: 'x',
+      alias: '时间'
+    },
+    {
+      dataKey: 'y',
+      alias: '用户数',
+      min: 0,
+      max: 10
+    }]
+
+  const searchData = []
+  for (let i = 0; i < 50; i += 1) {
+    searchData.push({
+      index: i + 1,
+      keyword: `搜索关键词-${i}`,
+      count: Math.floor(Math.random() * 1000),
+      range: Math.floor(Math.random() * 100),
+      status: Math.floor((Math.random() * 10) % 2)
+    })
+  }
+
+  const DataSet = require('@antv/data-set')
+
+  const sourceData = [
+    { item: '家用电器', count: 32.2 },
+    { item: '食用酒水', count: 21 },
+    { item: '个护健康', count: 17 },
+    { item: '服饰箱包', count: 13 },
+    { item: '母婴产品', count: 9 },
+    { item: '其他', count: 7.8 }
+  ]
+
+  const pieScale = [{
+    dataKey: 'percent',
+    min: 0,
+    formatter: '.0%'
+  }]
+
+  const dv = new DataSet.View().source(sourceData)
+  dv.transform({
+    type: 'percent',
+    field: 'count',
+    dimension: 'item',
+    as: 'percent'
+  })
+  const pieData = dv.rows
+
+  export default {
+    name: 'Analysis',
+    mixins: [baseMixin],
+    components: {
+      ChartCard,
+      MiniArea,
+      MiniBar,
+      MiniProgress,
+      RankList,
+      Bar,
+      Trend,
+      NumberInfo,
+      MiniSmoothArea
+    },
+    data () {
+      return {
+        loading: true,
+        rankList:[
+          {name:'辣椒炒肉',total:30},
+          {name:'番茄炒蛋',total:309},
+          {name:'紫菜蛋汤',total:400}
+        ],
+
+        // 搜索用户数
+        searchUserData,
+        searchUserScale,
+        searchData,
+
+        barData : [
+          {x : '1月',y : 12000},
+          {x : '2月',y : 10000},
+          {x : '3月',y : 21000},
+          {x : '4月',y : 14000},
+          {x : '5月',y : 13400},
+          {x : '6月',y : 12000},
+          {x : '7月',y : 12000},
+          {x : '8月',y : 12000},
+          {x : '9月',y : 12000},
+          {x : '10月',y : 12000},
+          {x : '11月',y : 12000},
+          {x : '12月',y : 12000}
+        ],
+        barData2 : [],
+
+        //
+        pieScale,
+        pieData,
+        sourceData,
+        pieStyle: {
+          stroke: '#fff',
+          lineWidth: 1
+        },
+        saleNumber:[
+          {x:'2022-01-01',y:111},
+          {x:'2022-01-02',y:122},
+          {x:'2022-01-03',y:131},
+          {x:'2022-01-04',y:112},
+        ],//卖出总数图
+        orderPay:[
+          {x:'2022-01-01',y:5},
+          {x:'2022-01-02',y:10},
+          {x:'2022-01-03',y:2},
+          {x:'2022-01-04',y:15},
+        ]//支付订单数量
+      }
+    },
+    computed: {
+      searchTableColumns () {
+        return [
+          {
+            dataIndex: 'index',
+            title: this.$t('dashboard.analysis.table.rank'),
+            width: 90
+          },
+          {
+            dataIndex: 'keyword',
+            title: this.$t('dashboard.analysis.table.search-keyword')
+          },
+          {
+            dataIndex: 'count',
+            title: this.$t('dashboard.analysis.table.users')
+          },
+          {
+            dataIndex: 'range',
+            title: this.$t('dashboard.analysis.table.weekly-range'),
+            align: 'right',
+            sorter: (a, b) => a.range - b.range,
+            scopedSlots: { customRender: 'range' }
+          }
+        ]
+      }
+    },
+    created () {
+      setTimeout(() => {
+        this.loading = !this.loading
+      }, 1000)
+    },
+    methods:{
+      searchRankList(type){
+        console.log(type)
+      }
+    }
+  }
 </script>
 
 <style lang="less" scoped>

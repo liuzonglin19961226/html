@@ -21,7 +21,7 @@ export const asyncRouterMap = [
         name: 'Analysis',
         // component: RouteView,
         component: () => import('@/views/dashboard/Analysis'),
-        meta: { title: 'menu.dashboard', keepAlive: true, icon: bxAnaalyse, permission: ['dashboard'] }
+        meta: { title: '仪表盘', keepAlive: true, icon: bxAnaalyse, permission: ['dashboard'] }
       },
       // 用户管理
       {
