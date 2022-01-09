@@ -91,6 +91,7 @@
                 src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
               />-->
             </a-list-item-meta>
+<!--            <a-row :gutter="48"></a-row>-->
             <span>{{item.goodsPrice}}元/{{item.goodsUnit}},</span>
             <span style="color: red">折扣：{{item.goodsSale}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
             <span>x{{item.goodsNumber}}</span>

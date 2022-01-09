@@ -33,8 +33,6 @@
       rowKey="memberOrderID"
       :columns="columns"
       :data="loadData"
-      :alert="true"
-      :rowSelection="rowSelection"
       showPagination="auto"
     >
         <span slot="serial" slot-scope="text, record, index">
@@ -59,6 +57,8 @@
           <template>
             <a @click="handleDetail(record)" v-show="record.status === 0">修改</a>
             <a @click="openDetail(record)" v-show="record.status === 1">查看</a>
+             <a-divider type="vertical" v-show="record.status === 1"/>
+            <a @click="printOrder(record)" v-show="record.status === 1">打印小票</a>
             <a-divider type="vertical" v-show="record.status === 0"/>
             <a @click="handleEditPay(record)" v-show="record.status === 0">支付</a>
             <a-divider type="vertical" v-show="record.status === 0"/>
@@ -99,18 +99,24 @@
   import {STable, Ellipsis} from '@/components'
   import {
     memberOrderList,
-    memberOrderPay
+    memberOrderPay,
+    memberOrderPrint
   } from '@/api/memberOrder'
   import PayForm from './components/PayForm'
   import StepByStepModal from '@/views/list/modules/StepByStepModal'
   import CreateForm from './components/CreateForm'
   import DetailForm from './components/DetailForm'
   import {memberCardPay} from "@/api/memberCard";
+  import {unLockUser} from "@/api/user";
 
   const columns = [
     {
       title: '序号',
       scopedSlots: {customRender: 'serial'}
+    },
+    {
+      title: '订单号',
+      dataIndex: 'memberOrderID'
     },
     {
       title: '会员卡号',
@@ -258,6 +264,26 @@
         this.queryParam = {
           date: moment(new Date())
         }
+      },
+      printOrder(record){
+        const _this = this
+        _this.$confirm({
+          content: this.redContent(`是否要打印小票？`),
+          onOk() {
+            memberOrderPrint({'memberOrderID': record.memberOrderID})
+              .then((res) => {
+                  if (res.state === 'success') {
+                    _this.$message.info(res.message)
+                  } else {
+                    _this.$message.error(res.message)
+                  }
+                }
+              )
+              .catch(err => _this.$message.error(err))
+          },
+          onCancel() {
+          }
+        })
       },
       handleOkPay() {
         const form = this.$refs.payModal.form

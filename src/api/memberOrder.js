@@ -4,6 +4,7 @@ const api = {
   memberOrderInsert: '/interface/api/memberOrder/memberOrderInsert',
   memberOrderDetail: '/interface/api/memberOrder/memberOrderDetail',
   memberOrderPay: '/interface/api/memberOrder/memberOrderPay',
+  memberOrderPrint: '/interface/api/memberOrder/memberOrderPrint',
 }
 
 export function memberOrderList (parameter) {
@@ -34,6 +35,14 @@ export function memberOrderDetail (parameter) {
 export function memberOrderPay (parameter) {
   return request({
     url: api.memberOrderPay,
+    method: 'get',
+    params: parameter
+  })
+}
+
+export function memberOrderPrint (parameter) {
+  return request({
+    url: api.memberOrderPrint,
     method: 'get',
     params: parameter
   })
