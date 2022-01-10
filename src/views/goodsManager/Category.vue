@@ -346,6 +346,10 @@
         },
         handleCancelReturnGoods() {
           this.visibleReturnGoods = false
+          this.mdlReturnGoods = null
+          this.$refs.returnGoodsModal.data =[]
+          this.$refs.returnGoodsModal.goodsName =''
+          this.$refs.returnGoodsModal.goodsNumber = 1
         },
         handleOk() {
           const form = this.$refs.createModal.form
@@ -415,9 +419,10 @@
           this.mdl = null
           this.visible = true
         },
-        handleAddReturnGoods() {
+        handleAddReturnGoods(goodsID) {
           this.mdlReturnGoods = null
           this.visibleReturnGoods = true
+          this.mdlReturnGoods = {goodsID:goodsID}
         },
         handleEdit(goodsID) {
           this.visible = true

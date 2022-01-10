@@ -5,6 +5,8 @@ const api = {
   goodsSearch: '/interface/api/category/goodsSearch',
   goodsUpdate: '/interface/api/category/goodsUpdate',
   goodsDelete: '/interface/api/category/goodsDelete',
+  returnGoodsInsert: '/interface/api/category/returnGoodsInsert',
+  returnGoodsList: '/interface/api/category/returnGoodsList'
 }
 
 export function goodsList (parameter) {
@@ -42,6 +44,22 @@ export function goodsSearch (parameter) {
 export function goodsDelete (parameter) {
   return request({
     url: api.goodsDelete,
+    method: 'get',
+    params: parameter
+  })
+}
+
+export function returnGoodsInsert (parameter) {
+  return request({
+    url: api.returnGoodsInsert,
+    method: 'get',
+    params: parameter
+  })
+}
+
+export function returnGoodsList (parameter) {
+  return request({
+    url: api.returnGoodsList,
     method: 'get',
     params: parameter
   })

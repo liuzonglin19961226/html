@@ -6,8 +6,9 @@
     :confirmLoading="loading"
     @ok="ok"
     @cancel="() => { $emit('cancel') }"
+    okText="保存"
   >
-    <a-spin :spinning="loading">
+    <a-spin :spinning="loading||loadingReturnGoods">
       <a-row :gutter="48">
         <a-col :md="8" :sm="24">
           菜品
@@ -32,7 +33,7 @@
         </a-col>
       </a-row>
 
-      <a-row :gutter="48" v-for="(item,index) of data" v-bind:key="item.goodsID">
+      <a-row :gutter="48" v-for="(item,index) of data" v-bind:key="item.returnGoodsID">
         <a-col :md="8" :sm="24">
           {{item.goodsName}}
         </a-col>
@@ -49,7 +50,10 @@
 </template>
 
 <script>
-import pick from 'lodash.pick'
+import {
+  returnGoodsInsert,
+  returnGoodsList
+} from '@/api/goods'
 
 export default {
   props: {
@@ -70,14 +74,19 @@ export default {
     return {
       num:1,
       data:[],
-      goodsName:''
+      goodsName:'',
+      goodsID:'',
+      loadingReturnGoods:false
     }
   },
   created () {
 
     // 当 model 发生改变时，为表单设置值
     this.$watch('model', () => {
-      this.model && this.form.setFieldsValue(pick(this.model, fields))
+      if (this.model){
+        this.goodsID = this.model.goodsID
+        this.loadReturnGoodsList(this.model.goodsID)
+      }
     })
   },
   methods:{
@@ -117,8 +126,36 @@ export default {
         const obj = this.data[i]
         paramStr += obj.goodsName+','+obj.goodsNumber+';'
       }
-      console.log(paramStr)
-    }
+      returnGoodsInsert({goodsID:this.goodsID,value:paramStr})
+        .then((res) => {
+            if (res.state === 'success') {
+              this.$message.info(`保存成功`)
+            } else {
+              this.$message.error(`保存失败`)
+            }
+          }
+        )
+        .catch(err => {
+          this.$message.error(err)
+        })
+    },
+    loadReturnGoodsList(goodsID){
+      this.loadingReturnGoods = true
+      returnGoodsList({goodsID:goodsID})
+        .then((res) => {
+            if (res.state === 'success') {
+              this.data = res.data
+            } else {
+              this.$message.error(`查询套餐失败`)
+            }
+            this.loadingReturnGoods = false
+          }
+        )
+        .catch(err => {
+          this.$message.error(err)
+          this.loadingReturnGoods = false
+        })
+    },
   }
 }
 </script>
