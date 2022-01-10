@@ -37,7 +37,7 @@
 
         <a-col :md="11" :sm="24">
           <a-button v-show="categoryName" class="button" type="primary" icon="search" @click="searchGoods">
-            查询商品
+            查询产品
           </a-button>
           <a-button v-show="categoryName" v-if="!updateFlag&&!insertFlag" class="button" type="primary" icon="plus" @click="insertCategory">
             新增分类
@@ -66,7 +66,7 @@
     </a-spin>
     <a-spin :spinning="goodsLoading">
       <a-row :gutter="48" style="padding:40px">
-        <a-list
+          <a-list
           class="demo-loadmore-list"
           :loading="loading"
           item-layout="horizontal"
@@ -81,6 +81,7 @@
           </div>-->
           <a-list-item slot="renderItem" slot-scope="item, index">
             <a slot="actions" @click="handleEdit(item.goodsID)">修改</a>
+            <a slot="actions" @click="handleAddReturnGoods(item.goodsID)" v-show="item.parentLevel === -3">套餐管理</a>
             <a slot="actions" @click="handleDelete(item.goodsID,item.goodsName)">删除</a>
             <a-list-item-meta
               :description="item.goodsDesc"
@@ -91,10 +92,19 @@
                 src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
               />-->
             </a-list-item-meta>
-<!--            <a-row :gutter="48"></a-row>-->
-            <span>{{item.goodsPrice}}元/{{item.goodsUnit}},</span>
-            <span style="color: red">折扣：{{item.goodsSale}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-            <span>x{{item.goodsNumber}}</span>
+            <a-row :gutter="48" style="width: 400px">
+              <a-col :md="8" :sm="16">
+                <span>{{item.goodsPrice}}元/{{item.goodsUnit}}</span>
+              </a-col>
+
+              <a-col :md="8" :sm="16">
+                <span style="color: red">折扣：{{item.goodsSale}}</span>
+              </a-col>
+
+              <a-col :md="8" :sm="16">
+                <span>x{{item.goodsNumber}}</span>
+              </a-col>
+            </a-row>
           </a-list-item>
         </a-list>
 
@@ -113,6 +123,15 @@
       :model="mdl"
       @cancel="handleCancel"
       @ok="handleOk"
+    />
+
+    <returnGoods-form
+      ref="returnGoodsModal"
+      :visible="visibleReturnGoods"
+      :loading="confirmLoadingReturnGoods"
+      :model="mdlReturnGoods"
+      @cancel="handleCancelReturnGoods"
+      @ok="handleCancelReturnGoods"
     />
 
   </a-card>
@@ -136,13 +155,15 @@
     goodsDelete
   } from '@/api/goods'
   import CreateForm from './components/CreateForm'
+  import ReturnGoodsForm from './components/ReturnGoodsForm'
     export default {
       name: "Category",
       components: {
         [TreeSelect.name]: TreeSelect,
         ATreeSelectNode: TreeSelect.TreeNode,
         ATreeSelect: TreeSelect,
-        CreateForm
+        CreateForm,
+        ReturnGoodsForm
       },
       data() {
         return {
@@ -164,6 +185,10 @@
           visible: false,
           confirmLoading: false,
           mdl: null,
+          // 套餐 model
+          confirmLoadingReturnGoods: false,
+          visibleReturnGoods: false,
+          mdlReturnGoods: null,
         };
       },
       mounted() {
@@ -294,7 +319,7 @@
             }
           })
         },
-        //商品相关start
+        //产品相关start
         searchGoods(){
           this.goodsLoading = true
           const param = {}
@@ -306,7 +331,7 @@
                   this.isSearch = true
                   this.goodsLoading = false
                 } else {
-                  this.$message.error(`查询商品失败`)
+                  this.$message.error(`查询产品失败`)
                 }
               }
             )
@@ -318,6 +343,9 @@
           this.visible = false
           const form = this.$refs.createModal.form
           form.resetFields() // 清理表单数据（可不做）
+        },
+        handleCancelReturnGoods() {
+          this.visibleReturnGoods = false
         },
         handleOk() {
           const form = this.$refs.createModal.form
@@ -387,6 +415,10 @@
           this.mdl = null
           this.visible = true
         },
+        handleAddReturnGoods() {
+          this.mdlReturnGoods = null
+          this.visibleReturnGoods = true
+        },
         handleEdit(goodsID) {
           this.visible = true
           const param ={}
@@ -408,8 +440,8 @@
           param.goodsID = goodsID
           const _this = this
           _this.$confirm({
-            title: '删除商品',
-            content: this.redContent(`是否要删除商品`+goodsName+`？`),
+            title: '删除产品',
+            content: this.redContent(`是否要删除产品`+goodsName+`？`),
             onOk() {
               goodsDelete(param)
                 .then((res) => {
@@ -429,7 +461,7 @@
             }
           })
         }
-        //商品相关end
+        //产品相关end
       }
     }
 </script>

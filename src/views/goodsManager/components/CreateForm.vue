@@ -1,6 +1,6 @@
 <template>
   <a-modal
-    title="商品管理"
+    title="产品管理"
     :width="640"
     :visible="visible"
     :confirmLoading="loading"
@@ -13,22 +13,22 @@
         <a-form-item v-show="model && model.goodsID > 0" label="主键ID">
           <a-input v-decorator="['goodsID']" disabled />
         </a-form-item>
-        <a-form-item label="商品名称">
-          <a-input v-decorator="['goodsName', {rules: [{required: true, message: '请输入商品名称！'}]}]" />
+        <a-form-item label="产品名称">
+          <a-input v-decorator="['goodsName', {rules: [{required: true, message: '请输入产品名称！'}]}]" />
         </a-form-item>
-        <a-form-item label="商品单价">
+        <a-form-item label="产品单价">
           <a-input-number :min="0" v-decorator="['goodsPrice', {rules: [{required: true,  message: '请输入单价！'}],initialValue: 0}]" />
         </a-form-item>
-        <a-form-item label="商品数量">
+        <a-form-item label="产品数量">
           <a-input-number :min="0" v-decorator="['goodsNumber', {rules: [{required: true,  message: '请输入数量！'}],initialValue: 0}]" />
         </a-form-item>
-        <a-form-item label="商品单位">
-          <a-input v-decorator="['goodsUnit', {rules: [{required: true, message: '请输入商品单位！'}]}]" />
+        <a-form-item label="产品单位">
+          <a-input v-decorator="['goodsUnit', {rules: [{required: true, message: '请输入产品单位！'}]}]" />
         </a-form-item>
-        <a-form-item label="商品折扣">
-          <a-input v-decorator="['goodsSale']" />
+        <a-form-item label="产品折扣">
+          <a-input v-decorator="['goodsSale',{initialValue: 1}]" />
         </a-form-item>
-        <a-form-item label="商品描述">
+        <a-form-item label="产品描述">
           <a-input v-decorator="['goodsDesc']" />
         </a-form-item>
       </a-form>
