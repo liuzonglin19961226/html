@@ -111,6 +111,7 @@ export default {
       this.loadCategoryList()
     }
     this.$watch('model', () => {
+      console.log(this.model)
       if(this.model){
         this.memberOrderID = this.model.memberOrderID
         this.loadCategoryDetailList(this.model.memberOrderID)
@@ -131,7 +132,7 @@ export default {
 
       const _this = this
       _this.$confirm({
-        title: '新增订单',
+        title: (this.memberOrderID ?'修改':'新增')+'订单',
         content: this.redContent(`是否要`+(this.memberOrderID?'修改':'新增')+`订单？`),
         onOk() {
           memberOrderInsert(param)

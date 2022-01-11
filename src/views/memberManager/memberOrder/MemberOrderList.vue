@@ -53,9 +53,19 @@
           </a-tag>
         </span>
 
+        <span slot="sale" slot-scope="text, record">
+          <a-tag :color="record.changeType === '1' ? '#f50':'#2db7f5'" v-show="record.memberPriceSale">
+            {{ record.changeType === '1' ? record.changeMsg : record.memberPriceSale }}
+          </a-tag>
+           <span>
+
+          </span>
+        </span>
+
       <span slot="action" slot-scope="text, record">
           <template>
             <a @click="handleDetail(record)" v-show="record.status === 0">修改</a>
+             <a-divider type="vertical" v-show="record.status === 0"/>
             <a @click="changeAmount(record)" v-show="record.status === 0">调整金额</a>
             <a @click="openDetail(record)" v-show="record.status === 1">查看</a>
              <a-divider type="vertical" v-show="record.status === 1"/>
@@ -91,6 +101,15 @@
       :model="mdlDetail"
       @cancel="handleCancelDetail"
     />
+
+    <change-form
+      ref="changeModal"
+      :visible="visibleChange"
+      :loading="confirmLoadingChange"
+      :model="mdlChange"
+      @cancel="handleCancelChange"
+      @ok="handleOkChange"
+    />
     <!--<step-by-step-modal ref="modal" @ok="handleOk"/>-->
   </a-card>
 </template>
@@ -101,14 +120,14 @@
   import {
     memberOrderList,
     memberOrderPay,
-    memberOrderPrint
+    memberOrderPrint,
+    memberOrderChange
   } from '@/api/memberOrder'
   import PayForm from './components/PayForm'
   import StepByStepModal from '@/views/list/modules/StepByStepModal'
   import CreateForm from './components/CreateForm'
   import DetailForm from './components/DetailForm'
-  import {memberCardPay} from "@/api/memberCard";
-  import {unLockUser} from "@/api/user";
+  import ChangeForm from './components/ChangeForm'
 
   const columns = [
     {
@@ -141,7 +160,8 @@
     },
     {
       title: '优惠金额',
-      dataIndex: 'memberPriceSale'
+      dataIndex: 'memberPriceSale',
+      scopedSlots: {customRender: 'sale'}
     },
     {
       title: '订单状态',
@@ -177,7 +197,8 @@
       CreateForm,
       StepByStepModal,
       PayForm,
-      DetailForm
+      DetailForm,
+      ChangeForm
     },
     data() {
       this.columns = columns
@@ -208,6 +229,10 @@
         visibleDetail: false,
         confirmLoadingDetail: false,
         mdlDetail: null,
+        // change model
+        visibleChange: false,
+        confirmLoadingChange: false,
+        mdlChange: null,
       }
     },
     filters: {},
@@ -230,13 +255,17 @@
         this.visible = true
         this.mdl = {...record}
       },
+      changeAmount(record) {
+        this.visibleChange = true
+        this.mdlChange = {...record}
+      },
       openDetail(record) {
         this.visibleDetail = true
         this.mdlDetail = {...record}
       },
       handleCancel() {
         this.visible = false
-
+        this.$refs.goodsData = []
         const form = this.$refs.createModal.form
         form.resetFields() // 清理表单数据（可不做）
         this.$refs.table.refresh(true)
@@ -245,6 +274,12 @@
         this.visiblePay = false
 
         const form = this.$refs.payModal.form
+        form.resetFields() // 清理表单数据（可不做）
+      },
+      handleCancelChange() {
+        this.visibleChange = false
+
+        const form = this.$refs.changeModal.form
         form.resetFields() // 清理表单数据（可不做）
       },
       handleCancelDetail() {
@@ -320,6 +355,42 @@
             })
           } else {
             this.confirmLoadingPay = false
+          }
+        })
+      },
+      handleOkChange() {
+        const form = this.$refs.changeModal.form
+        this.confirmLoadingChange = true
+        form.validateFields((errors, values) => {
+          if (!errors) {
+            // 修改 e.g.
+            new Promise((resolve, reject) => {
+              memberOrderChange(values)
+                .then((res) => {
+                    if (res.state === 'success') {
+                      this.$message.info(res.message)
+                    } else {
+                      this.$message.error(res.message)
+                    }
+                    resolve()
+                  }
+                )
+                .catch(err => {
+                    this.$message.error(err)
+                    reject(err)
+                    resolve()
+                  }
+                )
+            }).then(res => {
+              this.visibleChange = false
+              this.confirmLoadingChange = false
+              // 重置表单数据
+              form.resetFields()
+              // 刷新表格
+              this.$refs.table.refresh()
+            })
+          } else {
+            this.confirmLoadingChange = false
           }
         })
       },

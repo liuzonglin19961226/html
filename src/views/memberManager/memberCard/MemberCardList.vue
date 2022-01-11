@@ -46,11 +46,11 @@
           <template>
             <a @click="handleDetail(record)">查看明细</a>
             <a-divider type="vertical"/>
+            <a @click="handleEdit(record)">修改信息</a>
+            <a-divider type="vertical"/>
             <a @click="handleEditRecharge(record)">充值</a>
             <a-divider type="vertical"/>
             <a @click="handleEditPay(record)">支付</a>
-            <a-divider type="vertical"/>
-            <a @click="handledeleteUser(record)">修改密码</a>
             <a-divider type="vertical"/>
           </template>
         </span>
@@ -101,7 +101,8 @@
     memberCardList,
     memberCardInsert,
     memberCardPay,
-    memberCardRecharge
+    memberCardRecharge,
+    memberCardUpdate
   } from '@/api/memberCard'
 
   import StepByStepModal from '@/views/list/modules/StepByStepModal'
@@ -126,6 +127,10 @@
     {
       title: '会员电话',
       dataIndex: 'memberPhone'
+    },
+    {
+      title: '会员卡密码',
+      dataIndex: 'payPassword'
     },
     {
       title: '余额',
@@ -221,6 +226,7 @@
       handleEdit(record) {
         this.visible = true
         this.mdl = {...record}
+        this.mdl.id = '111'
       },
       handleEditPay(record) {
         this.visiblePay = true
@@ -235,13 +241,25 @@
         this.confirmLoading = true
         form.validateFields((errors, values) => {
           if (!errors) {
-            console.log('values', values)
             if (values.id) {
               // 修改 e.g.
               new Promise((resolve, reject) => {
-                setTimeout(() => {
-                  resolve()
-                }, 1000)
+                memberCardUpdate(values)
+                  .then((res) => {
+                      if (res.state === 'success') {
+                        this.$message.info(`修改成功`)
+                      } else {
+                        this.$message.error(`修改失败`)
+                      }
+                      resolve()
+                    }
+                  )
+                  .catch(err => {
+                      this.$message.error(err)
+                      reject(err)
+                      resolve()
+                    }
+                  )
               }).then(res => {
                 this.visible = false
                 this.confirmLoading = false
@@ -249,8 +267,6 @@
                 form.resetFields()
                 // 刷新表格
                 this.$refs.table.refresh()
-
-                this.$message.info('修改成功')
               })
             } else {
               // 新增
@@ -262,7 +278,7 @@
                       } else {
                         this.$message.error(`新增失败`)
                       }
-                      resolve(res.message)
+                      resolve()
                     }
                   )
                   .catch(err => {
@@ -365,7 +381,7 @@
       },
       handleCancel() {
         this.visible = false
-
+        this.mdl = null
         const form = this.$refs.createModal.form
         form.resetFields() // 清理表单数据（可不做）
       },
