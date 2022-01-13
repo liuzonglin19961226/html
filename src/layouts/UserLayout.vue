@@ -8,8 +8,8 @@
       <div class="user-layout-content">
         <div class="top">
           <div class="header">
-            <img src="../assets/logo.svg" class="logo" alt="logo">
-            <span class="title">Ant Design</span>
+            <img src="../assets/sh.png" class="logo" alt="logo">
+            <span class="title">上海丰嵊</span>
           </div>
           <div class="desc">
             {{ $t('layouts.userLayout.title') }}

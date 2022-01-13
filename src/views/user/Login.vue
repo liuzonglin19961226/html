@@ -195,11 +195,11 @@ export default {
             .then((res) => {
                 this.loginSuccess(res)
               }
-            )
+            )/*
             .catch(err => {
               this.errorMsg = err
               this.requestFailed(err)
-            })
+            })*/
             .finally(() => {
               state.loginBtn = false
             })
