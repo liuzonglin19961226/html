@@ -1,6 +1,6 @@
 <template>
   <a-modal
-    title="新建用户"
+    title="付款"
     :width="640"
     :visible="visible"
     :confirmLoading="loading"
@@ -14,7 +14,7 @@
           <a-input v-decorator="['memberCardNo']" disabled />
         </a-form-item>
         <a-form-item label="付款金额">
-          <a-input-number :min="1" :step="100" v-decorator="['amount', {rules: [{required: true, message: '请输入付款金额！'}]}]" />
+          <a-input-number :min="0" :step="100" v-decorator="['amount', {rules: [{required: true, message: '请输入付款金额！'}]}]" />
         </a-form-item>
       </a-form>
     </a-spin>

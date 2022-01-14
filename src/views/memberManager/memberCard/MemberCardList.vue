@@ -52,6 +52,7 @@
             <a-divider type="vertical"/>
             <a @click="handleEditPay(record)">支付</a>
             <a-divider type="vertical"/>
+            <a @click="sendRechargeSms(record)">发送短信</a>
           </template>
         </span>
 
@@ -102,7 +103,8 @@
     memberCardInsert,
     memberCardPay,
     memberCardRecharge,
-    memberCardUpdate
+    memberCardUpdate,
+    memberCardSms
   } from '@/api/memberCard'
 
   import StepByStepModal from '@/views/list/modules/StepByStepModal'
@@ -110,6 +112,7 @@
   import PayForm from './components/PayForm'
   import RechargeForm from './components/RechargeForm'
   import DetailForm from './components/DetailForm'
+  import {initPassword} from "@/api/user";
 
   const columns = [
     {
@@ -235,6 +238,24 @@
       handleEditRecharge(record) {
         this.visibleRecharge = true
         this.mdlRecharge = {...record}
+      },
+      sendRechargeSms(record) {
+        const _this = this
+        _this.$confirm({
+          // content: `是否要重置用户"${record.userName}"密码？`,
+          content: h => this.redContent(`是否要发送会员卡创建短信`),
+          onOk() {
+            memberCardSms({'memberCardNo': record.memberCardNo})
+              .then((res) => {
+                  if (res.state === 'success') {
+                    _this.$message.info('短信发送成功')
+                  } else {
+                    _this.$message.error(res.message)
+                  }
+                }
+              )
+          }
+        })
       },
       handleOk() {
         const form = this.$refs.createModal.form

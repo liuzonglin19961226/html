@@ -6,6 +6,7 @@ const api = {
   memberOrderPay: '/interface/api/memberOrder/memberOrderPay',
   memberOrderPrint: '/interface/api/memberOrder/memberOrderPrint',
   memberOrderChange: '/interface/api/memberOrder/memberOrderChange',
+  queryStatistics: '/interface/api/memberOrder/queryStatistics',
 }
 
 export function memberOrderList (parameter) {
@@ -52,6 +53,14 @@ export function memberOrderPrint (parameter) {
 export function memberOrderChange (parameter) {
   return request({
     url: api.memberOrderChange,
+    method: 'get',
+    params: parameter
+  })
+}
+
+export function queryStatistics (parameter) {
+  return request({
+    url: api.queryStatistics,
     method: 'get',
     params: parameter
   })

@@ -217,7 +217,7 @@
             })
         },
         selectTree(value,e) {
-          console.log(e)
+          this.searchGoods(value)
           this.categoryName = e.title
           this.categoryID = value
         },
@@ -320,10 +320,10 @@
           })
         },
         //产品相关start
-        searchGoods(){
+        searchGoods(value){
           this.goodsLoading = true
           const param = {}
-          param.goodsCategoryID = this.categoryID
+          param.goodsCategoryID = (value?value:this.categoryID)
           goodsList(param)
             .then((res) => {
                 if (res.state === 'success') {
@@ -420,7 +420,6 @@
           this.visible = true
         },
         handleAddReturnGoods(goodsID) {
-          this.mdlReturnGoods = null
           this.visibleReturnGoods = true
           this.mdlReturnGoods = {goodsID:goodsID}
         },

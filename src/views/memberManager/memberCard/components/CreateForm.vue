@@ -20,8 +20,21 @@
         <a-form-item v-else label="会员卡号">
           <a-input v-decorator="['memberCardNo', {rules: [{required: true, message: '请输入会员卡号！'}]}]"  />
         </a-form-item>
-        <a-form-item label="会员姓名">
-          <a-input v-decorator="['memberName', {rules: [{required: true, message: '请输入会员姓名！'}]}]" />
+        <a-form-item label="会员姓">
+          <a-input v-decorator="['memberName', {rules: [{required: true, message: '请输入会员姓！'}]}]" />
+        </a-form-item>
+        <a-form-item label="会员名">
+          <a-input v-decorator="['memberOther', {rules: [{required: true, message: '请输入会员名！'}]}]" />
+        </a-form-item>
+        <a-form-item label="会员性别">
+          <a-select v-decorator="['memberSex', {rules: [{required: true, message: '请选择会员性别！'}]}]">
+            <a-select-option value="先生">
+              先生
+            </a-select-option>
+            <a-select-option value="女士">
+              女士
+            </a-select-option>
+          </a-select>
         </a-form-item>
         <a-form-item label="会员联系方式">
           <a-input v-decorator="['memberPhone', {rules: [{required: true, min: 6, message: '请输入会员联系方式！'}]}]" />
@@ -38,7 +51,7 @@
 import pick from 'lodash.pick'
 
 // 表单字段
-const fields = ['memberName', 'memberCardNo', 'memberPhone','payPassword','id']
+const fields = ['id','memberName', 'memberCardNo', 'memberPhone','payPassword','memberSex','memberOther']
 
 export default {
   props: {
@@ -78,6 +91,7 @@ export default {
 
     // 当 model 发生改变时，为表单设置值
     this.$watch('model', () => {
+      fields.forEach(v => this.form.getFieldDecorator(v))
       this.model && this.form.setFieldsValue(pick(this.model, fields))
     })
   }

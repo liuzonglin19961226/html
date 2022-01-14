@@ -5,7 +5,8 @@ const api = {
   memberCardRecharge: '/interface/api/memberCard/memberCardRecharge',
   memberCardPay: '/interface/api/memberCard/memberCardPay',
   memberCardListNoPage: '/interface/api/memberCard/memberCardListNoPage',
-  memberCardUpdate: '/interface/api/memberCard/memberCardUpdate'
+  memberCardUpdate: '/interface/api/memberCard/memberCardUpdate',
+  memberCardSms: '/interface/api/memberCard/memberCardSms',
 }
 
 export function memberCardList (parameter) {
@@ -51,6 +52,14 @@ export function memberCardListNoPage (parameter) {
 export function memberCardUpdate (parameter) {
   return request({
     url: api.memberCardUpdate,
+    method: 'get',
+    params: parameter
+  })
+}
+
+export function memberCardSms (parameter) {
+  return request({
+    url: api.memberCardSms,
     method: 'get',
     params: parameter
   })

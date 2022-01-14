@@ -2,25 +2,28 @@
   <div>
     <a-row :gutter="24">
       <a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">
-        <chart-card :loading="loading" title="昨日销售额" total="￥126,560">
+        <chart-card :loading="loading" title="昨日销售额" :total="'￥'+yestPrice">
           <a-tooltip :title="$t('dashboard.analysis.introduce')" slot="action">
             <a-icon type="info-circle-o" />
           </a-tooltip>
           <div>
+            <mini-bar
+              :data="orderPrice"
+            />
             <!--<trend flag="up" style="margin-right: 16px;">
               <span slot="term">{{ $t('dashboard.analysis.week') }}</span>
               12%
             </trend>-->
-            <trend flag="down">
+           <!-- <trend flag="down">
               <span slot="term">{{ $t('dashboard.analysis.day') }}</span>
               11%
-            </trend>
+            </trend>-->
           </div>
-          <template slot="footer">{{ $t('dashboard.analysis.day-sales') }}<span>￥ 234.56</span></template>
+<!--          <template slot="footer">{{ $t('dashboard.analysis.day-sales') }}<span>￥ 234.56</span></template>-->
         </chart-card>
       </a-col>
       <a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">
-        <chart-card :loading="loading" title="昨日卖出总数" :total="130 | NumberFormat">
+        <chart-card :loading="loading" title="昨日卖出总数" :total="yestSale | NumberFormat">
           <a-tooltip :title="$t('dashboard.analysis.introduce')" slot="action">
             <a-icon type="info-circle-o" />
           </a-tooltip>
@@ -29,11 +32,11 @@
               :data="saleNumber"
             />
           </div>
-          <template slot="footer">日平均卖出总数<span> {{ '124' | NumberFormat }}</span></template>
+<!--          <template slot="footer">日平均卖出总数<span> {{ '124' | NumberFormat }}</span></template>-->
         </chart-card>
       </a-col>
       <a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">
-        <chart-card :loading="loading" :title="$t('dashboard.analysis.payments')" :total="30 | NumberFormat">
+        <chart-card :loading="loading" :title="$t('dashboard.analysis.payments')" :total="yestPay | NumberFormat">
           <a-tooltip :title="$t('dashboard.analysis.introduce')" slot="action">
             <a-icon type="info-circle-o" />
           </a-tooltip>
@@ -42,11 +45,11 @@
               :data="orderPay"
             />
           </div>
-          <template slot="footer">{{ $t('dashboard.analysis.conversion-rate') }} <span>100%</span></template>
+<!--          <template slot="footer">{{ $t('dashboard.analysis.conversion-rate') }} <span>100%</span></template>-->
         </chart-card>
       </a-col>
       <a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">
-        <chart-card :loading="loading" title="昨日进货额" total="￥50,000">
+        <chart-card :loading="loading" title="昨日进货额" :total="'￥'+returnGoodsNum">
           <a-tooltip :title="$t('dashboard.analysis.introduce')" slot="action">
             <a-icon type="info-circle-o" />
           </a-tooltip>
@@ -55,12 +58,12 @@
               <span slot="term">{{ $t('dashboard.analysis.week') }}</span>
               12%
             </trend>-->
-            <trend flag="down">
+          <!--  <trend flag="down">
               <span slot="term">{{ $t('dashboard.analysis.day') }}</span>
               11%
-            </trend>
+            </trend>-->
           </div>
-          <template slot="footer">日均进货额<span>￥ 234.56</span></template>
+<!--          <template slot="footer">日均进货额<span>￥ 234.56</span></template>-->
         </chart-card>
       </a-col>
       <!--<a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">
@@ -236,6 +239,9 @@
 <script>
   import moment from 'moment'
   import {
+    queryStatistics
+  } from '@/api/memberOrder'
+  import {
     ChartCard,
     MiniArea,
     MiniBar,
@@ -358,18 +364,13 @@
           stroke: '#fff',
           lineWidth: 1
         },
-        saleNumber:[
-          {x:'2022-01-01',y:111},
-          {x:'2022-01-02',y:122},
-          {x:'2022-01-03',y:131},
-          {x:'2022-01-04',y:112},
-        ],//卖出总数图
-        orderPay:[
-          {x:'2022-01-01',y:5},
-          {x:'2022-01-02',y:10},
-          {x:'2022-01-03',y:2},
-          {x:'2022-01-04',y:15},
-        ]//支付订单数量
+        saleNumber:[],//卖出总数图
+        orderPay:[],//支付订单数量
+        orderPrice:[],//支付订单额度
+        returnGoodsNum:0,
+        yestPrice:0,
+        yestSale:0,
+        yestPay:0,
       }
     },
     computed: {
@@ -403,9 +404,35 @@
         this.loading = !this.loading
       }, 1000)
     },
+    mounted() {
+      this.loadData()
+    },
     methods:{
       searchRankList(type){
         console.log(type)
+      },
+      loadData(){
+        queryStatistics()
+          .then((res) => {
+              this.returnGoodsNum = res.data.yesterReturnGoods.num
+              this.yestPrice = res.data.yesterdayData.yestPrice
+              this.yestSale = res.data.yesterdayData.yestGoodsNum
+              this.yestPay = res.data.yesterdayData.yestOrderNum
+
+              for (let i=0 ; i<res.data.getLastSevenData.length; i++){
+                const obj = res.data.getLastSevenData[i]
+                this.saleNumber.push({x:obj.goodsNum,y:obj.time})
+              }
+              for (let i=0 ; i<res.data.getLastSevenData.length; i++){
+                const obj = res.data.getLastSevenData[i]
+                this.orderPay.push({x:obj.num,y:obj.time})
+              }
+              for (let i=0 ; i<res.data.getLastSevenData.length; i++){
+                const obj = res.data.getLastSevenData[i]
+                this.orderPrice.push({x:obj.orderPrice,y:obj.time})
+              }
+            }
+          )
       }
     }
   }

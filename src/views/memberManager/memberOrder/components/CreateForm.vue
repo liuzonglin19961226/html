@@ -54,7 +54,7 @@
 
 <script>
 import pick from 'lodash.pick'
-import {Collapse} from "ant-design-vue";
+import {Collapse} from "ant-design-vue"
 import {
   categoryGoodsList
 } from '@/api/category'
