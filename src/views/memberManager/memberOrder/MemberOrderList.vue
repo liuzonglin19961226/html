@@ -70,6 +70,8 @@
             <a @click="openDetail(record)" v-show="record.status === 1">查看</a>
              <a-divider type="vertical"/>
             <a @click="printOrder(record)">打印小票</a>
+            <a-divider type="vertical"/>
+            <a @click="printOrder(record,'noMoney')">打印小票(无金额)</a>
             <a-divider type="vertical" v-show="record.status === 0"/>
             <a @click="handleEditPay(record)" v-show="record.status === 0">支付</a>
             <a-divider type="vertical" v-show="record.status === 0"/>
@@ -301,12 +303,12 @@
           date: moment(new Date())
         }
       },
-      printOrder(record){
+      printOrder(record,type){
         const _this = this
         _this.$confirm({
           content: this.redContent(`是否要打印小票？`),
           onOk() {
-            memberOrderPrint({'memberOrderID': record.memberOrderID})
+            memberOrderPrint({'memberOrderID': record.memberOrderID,type:type?type:''})
               .then((res) => {
                   if (res.state === 'success') {
                     _this.$message.info(res.message)
