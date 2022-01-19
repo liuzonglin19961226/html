@@ -37,7 +37,7 @@
 
           <a-row :gutter="48" v-for="(item,index) of data" v-bind:key="item.returnGoodsID">
             <a-col :md="8" :sm="24">
-              {{item.goodsName}}
+              {{index+1}}.{{item.goodsName}}
             </a-col>
             <a-col :md="8" :sm="24">
               {{item.goodsNumber}}{{item.goodsUnit}}
@@ -53,11 +53,14 @@
             <a-collapse v-model="activeKey">
               <a-collapse-panel v-for="(item1,index1) of categoryGoodsList" v-bind:key="item1.name" :key="item1.title" :header="item1.title">
                 <a-row v-for="(item2,index2) of item1.goodsList" v-bind:key="item2.goodsID">
-                  <a-col :md="6" :sm="24">{{item2.goodsName}}</a-col>
-                  <a-col :md="6" :sm="24">{{item2.goodsPrice}}元/{{item2.goodsUnit}}</a-col>
-                  <a-col :md="12" :sm="24">
+                  <a-col :md="6" :sm="24">{{item2.orderNumber}}.{{item2.goodsName}}</a-col>
+                  <a-col :md="3" :sm="24">/{{item2.goodsUnit}}</a-col>
+                  <a-col :md="5" :sm="24">
+                    <span v-show="item2.currentNum>0" style="font-size: 17px;font-weight: bold;color: red">已选择</span>
+                  </a-col>
+                  <a-col :md="10" :sm="24">
                     <a-input-number :id="item2.goodsID" :defaultValue="1" :min="1" style="width:70px;height:100%" />
-                    <a-icon type="plus"  style="cursor: pointer;font-size: 24px;color: mediumspringgreen"  @click="addGoods(item2)"/>
+                    <a-icon type="plus"  style="cursor: pointer;font-size: 24px;color: mediumspringgreen"  @click="addGoods(item2,index1,index2)"/>
                   </a-col>
                 </a-row>
               </a-collapse-panel>
@@ -114,14 +117,14 @@ export default {
     // 当 model 发生改变时，为表单设置值
     this.$watch('model', () => {
       if (this.model){
-        this.loadCategoryList()
+        this.loadCategoryList(this.model.goodsID)
         this.goodsID = this.model.goodsID
         this.loadReturnGoodsList(this.model.goodsID)
       }
     })
   },
   methods:{
-    addGoods(item){
+    addGoods(item,index1,index2){
       let index = -1;
       let obj = null;
       for (let i=0 ; i<this.data.length ; i++){
@@ -129,18 +132,40 @@ export default {
           index = i
           obj = this.data[i]
           break
+
         }
       }
 
       if (index === -1){
         this.data.push({goodsName:item.goodsName,goodsNumber:document.getElementById(item.goodsID).value,
-          goodsUnit:item.goodsUnit})
+          goodsUnit:item.goodsUnit,goodsDetailID:item.goodsID})
       }else{
         obj.goodsNumber = Number(obj.goodsNumber) + Number(document.getElementById(item.goodsID).value)
         this.$set(this.data,index,obj)
       }
+
+      //以下为选择商品逻辑
+      const goodsList = this.categoryGoodsList[index1]
+      goodsList.goodsList[index2].currentNum = 1
+      this.$set(this.categoryGoodsList,index1,goodsList)
     },
     deleteGoods(index){
+      const goodsDetailID = this.data[index].goodsDetailID
+      let index1 = -1
+      let index2 = -1
+      for (let i =0;i<this.categoryGoodsList.length;i++){
+        for (let n=0;n<this.categoryGoodsList[i].goodsList.length;n++){
+          const obj = this.categoryGoodsList[i].goodsList[n]
+          if (obj.goodsID === goodsDetailID){
+            index1 = i
+            index2 = n
+            break
+          }
+        }
+      }
+      const goodsList = this.categoryGoodsList[index1]
+      goodsList.goodsList[index2].currentNum = 0
+      this.$set(this.categoryGoodsList,index1,goodsList)
       this.data.splice(index,1)
     },
     ok(){
@@ -152,7 +177,7 @@ export default {
       let paramStr = ''
       for (let i = 0;i<this.data.length ;i++){
         const obj = this.data[i]
-        paramStr += obj.goodsName+','+obj.goodsNumber+','+obj.goodsUnit+';'
+        paramStr += obj.goodsName+','+obj.goodsNumber+','+obj.goodsUnit+','+obj.goodsDetailID+';'
       }
       returnGoodsInsert({goodsID:this.goodsID,value:paramStr})
         .then((res) => {
@@ -167,8 +192,8 @@ export default {
           this.$message.error(err)
         })
     },
-    loadCategoryList(){
-      categoryGoodsList({type:'returnGoods'})
+    loadCategoryList(goodsID){
+      categoryGoodsList({type:'returnGoods',goodsID:goodsID})
         .then((res) => {
             if (res.state === 'success') {
               this.categoryGoodsList = res.data

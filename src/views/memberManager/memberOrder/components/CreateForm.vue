@@ -1,6 +1,6 @@
 <template>
   <a-modal
-    title="新建订单"
+    title="订单管理"
     :width="1080"
     :visible="visible"
     :confirmLoading="loading"
@@ -30,12 +30,14 @@
             <a-collapse v-model="activeKey">
               <a-collapse-panel v-for="(item1,index1) of categoryGoodsList" v-bind:key="item1.name" :key="item1.title" :header="item1.title">
                   <a-row v-for="(item2,index2) of item1.goodsList" v-bind:key="item2.goodsID">
-                    <a-col :md="4" :sm="24">{{item2.goodsName}}</a-col>
+                    <a-col :md="4" :sm="24">{{item2.orderNumber}}.{{item2.goodsName}}</a-col>
                     <a-col :md="4" :sm="24">{{item2.goodsPrice}}元/{{item2.goodsUnit}}</a-col>
                     <a-col :md="4" :sm="24" style="color: red">折扣：{{item2.goodsSale}}</a-col>
 <!--                    <a-col :md="4" :sm="24">x{{item2.goodsNumber}}</a-col>-->
                     <a-col :md="6" :sm="24">
-                      当前数量：<span style="color: red">{{item2.currentNum?item2.currentNum:0}}</span>
+                      当前数量：
+                      <span style="color: red;font-size: 20px;font-weight: bold" v-if="item2.currentNum">{{item2.currentNum}}</span>
+                      <span style="color: red" v-if="!item2.currentNum">0</span>
                     </a-col>
                     <a-col :md="6" :sm="24">
                       <a-icon style="color: dodgerblue;cursor: pointer" @click="addGoods(item2,'minus',index1,index2)" type="minus" />

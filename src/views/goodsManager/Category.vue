@@ -39,25 +39,25 @@
           <a-button v-show="categoryName" class="button" type="primary" icon="search" @click="searchGoods">
             查询产品
           </a-button>
-          <a-button v-show="categoryName" v-if="!updateFlag&&!insertFlag" class="button" type="primary" icon="plus" @click="insertCategory">
+          <a-button v-show="categoryName&&categoryID!=='-3'" v-if="!updateFlag&&!insertFlag" class="button" type="primary" icon="plus" @click="insertCategory">
             新增分类
           </a-button>
-          <a-button v-show="categoryName" v-if="insertFlag" class="button" type="primary" icon="edit"  @click="cancelInsertCategory">
+          <a-button v-show="categoryName&&categoryID!=='-3'" v-if="insertFlag" class="button" type="primary" icon="edit"  @click="cancelInsertCategory">
             取消新增
           </a-button>
-          <a-button v-show="categoryName" v-if="updateFlag" class="button" type="primary" icon="edit"  @click="cancelCategory">
+          <a-button v-show="categoryName&&categoryID!=='-3'" v-if="updateFlag" class="button" type="primary" icon="edit"  @click="cancelCategory">
             取消修改
           </a-button>
-          <a-button v-show="categoryName" v-if="insertFlag" class="button" type="primary" icon="edit"  @click="confirmInsertCategory">
+          <a-button v-show="categoryName&&categoryID!=='-3'" v-if="insertFlag" class="button" type="primary" icon="edit"  @click="confirmInsertCategory">
             确认新增
           </a-button>
-          <a-button v-show="categoryName" v-if="updateFlag" class="button" type="primary" icon="edit"  @click="confirmCategory">
+          <a-button v-show="categoryName&&categoryID!=='-3'" v-if="updateFlag" class="button" type="primary" icon="edit"  @click="confirmCategory">
             确认修改
           </a-button>
-          <a-button v-show="categoryName" v-if="!insertFlag&&!updateFlag" class="button" type="primary" icon="edit"  @click="updateCategory">
+          <a-button v-show="categoryName&&categoryID!=='-3'" v-if="!insertFlag&&!updateFlag" class="button" type="primary" icon="edit"  @click="updateCategory">
             修改分类
           </a-button>
-          <a-button v-show="categoryName" v-if="!insertFlag&&!updateFlag" class="button" type="primary" icon="delete"  @click="deleteCategory">
+          <a-button v-show="categoryName&&categoryID!=='-3'" v-if="!insertFlag&&!updateFlag" class="button" type="primary" icon="delete"  @click="deleteCategory">
             删除
           </a-button>
         </a-col>
