@@ -40,7 +40,7 @@
               {{item.goodsName}}
             </a-col>
             <a-col :md="8" :sm="24">
-              {{item.goodsNumber}}
+              {{item.goodsNumber}}{{item.goodsUnit}}
             </a-col>
             <a-col :md="8" :sm="24">
               <a-icon type="delete"  style="cursor: pointer;font-size: 24px;color: red"  @click="deleteGoods(index)"/>
@@ -133,7 +133,8 @@ export default {
       }
 
       if (index === -1){
-        this.data.push({goodsName:item.goodsName,goodsNumber:document.getElementById(item.goodsID).value})
+        this.data.push({goodsName:item.goodsName,goodsNumber:document.getElementById(item.goodsID).value,
+          goodsUnit:item.goodsUnit})
       }else{
         obj.goodsNumber = Number(obj.goodsNumber) + Number(document.getElementById(item.goodsID).value)
         this.$set(this.data,index,obj)
@@ -151,7 +152,7 @@ export default {
       let paramStr = ''
       for (let i = 0;i<this.data.length ;i++){
         const obj = this.data[i]
-        paramStr += obj.goodsName+','+obj.goodsNumber+';'
+        paramStr += obj.goodsName+','+obj.goodsNumber+','+obj.goodsUnit+';'
       }
       returnGoodsInsert({goodsID:this.goodsID,value:paramStr})
         .then((res) => {

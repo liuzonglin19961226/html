@@ -68,8 +68,8 @@
              <a-divider type="vertical" v-show="record.status === 0"/>
             <a @click="changeAmount(record)" v-show="record.status === 0">调整金额</a>
             <a @click="openDetail(record)" v-show="record.status === 1">查看</a>
-             <a-divider type="vertical" v-show="record.status === 1"/>
-            <a @click="printOrder(record)" v-show="record.status === 1">打印小票</a>
+             <a-divider type="vertical"/>
+            <a @click="printOrder(record)">打印小票</a>
             <a-divider type="vertical" v-show="record.status === 0"/>
             <a @click="handleEditPay(record)" v-show="record.status === 0">支付</a>
             <a-divider type="vertical" v-show="record.status === 0"/>

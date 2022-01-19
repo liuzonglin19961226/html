@@ -31,14 +31,14 @@ const assetsCDN = {
   // https://unpkg.com/browse/vue@2.6.10/
   js: [
     //去掉cdn路径的引入，使用本地路径
-   /* './static/js/vue.min.js',
+    /*'./static/js/vue.min.js',
     './static/js/vue-router.min.js',
     './static/js/vuex.min.js',
     './static/js/axios.min.js'*/
-    '//cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js',
+    /*'//cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js',
     '//cdn.jsdelivr.net/npm/vue-router@3.5.1/dist/vue-router.min.js',
     '//cdn.jsdelivr.net/npm/vuex@3.1.1/dist/vuex.min.js',
-    '//cdn.jsdelivr.net/npm/axios@0.21.1/dist/axios.min.js'
+    '//cdn.jsdelivr.net/npm/axios@0.21.1/dist/axios.min.js'*/
   ]
 }
 
@@ -58,7 +58,7 @@ const vueConfig = {
       })
     ],
     // if prod, add externals
-    externals: isProd ? assetsCDN.externals : {}
+    // externals: isProd ? assetsCDN.externals : {}
   },
 
   chainWebpack: config => {
@@ -84,12 +84,12 @@ const vueConfig = {
 
     // if prod is on
     // assets require on cdn
-    if (isProd) {
+    /*if (isProd) {
       config.plugin('html').tap(args => {
         args[0].cdn = assetsCDN
         return args
       })
-    }
+    }*/
   },
 
   css: {
