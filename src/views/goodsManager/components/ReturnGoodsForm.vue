@@ -12,13 +12,16 @@
       <a-row :gutter="48">
         <a-col :md="12" :sm="24">
           <a-row :gutter="48">
-            <a-col :md="8" :sm="24">
+            <a-col :md="4" :sm="24">
+              序号
+            </a-col>
+            <a-col :md="10" :sm="24">
               菜品
             </a-col>
-            <a-col :md="8" :sm="24">
+            <a-col :md="5" :sm="24">
               数量
             </a-col>
-            <a-col :md="8" :sm="24">
+            <a-col :md="5" :sm="24">
               <div>操作</div>
             </a-col>
           </a-row>
@@ -35,16 +38,29 @@
             </a-col>
           </a-row>-->
 
-          <a-row :gutter="48" v-for="(item,index) of data" v-bind:key="item.returnGoodsID">
-            <a-col :md="8" :sm="24">
-              {{index+1}}.{{item.goodsName}}
-            </a-col>
-            <a-col :md="8" :sm="24">
-              {{item.goodsNumber}}{{item.goodsUnit}}
-            </a-col>
-            <a-col :md="8" :sm="24">
-              <a-icon type="delete"  style="cursor: pointer;font-size: 24px;color: red"  @click="deleteGoods(index)"/>
-            </a-col>
+          <a-row
+            :gutter="48"
+            v-for="(item,index) of data"
+            v-bind:key="item.returnGoodsID"
+            :id="'row'+index"
+          >
+            <div
+              @mouseover="over(item,index)"
+              @mouseout="out(item,index)"
+            >
+              <a-col :md="4" :sm="24">
+                <span style="font-weight:bold">{{index+1}}</span>
+              </a-col>
+              <a-col :md="10" :sm="24">
+                {{item.goodsName}}
+              </a-col>
+              <a-col :md="5" :sm="24">
+                {{item.goodsNumber}}{{item.goodsUnit}}
+              </a-col>
+              <a-col :md="5" :sm="24">
+                <a-icon type="delete"  style="cursor: pointer;font-size: 24px;color: red"  @click="deleteGoods(index)"/>
+              </a-col>
+            </div>
           </a-row>
         </a-col>
         <a-col :md="12" :sm="24">
@@ -52,16 +68,26 @@
           <div>
             <a-collapse v-model="activeKey">
               <a-collapse-panel v-for="(item1,index1) of categoryGoodsList" v-bind:key="item1.name" :key="item1.title" :header="item1.title">
-                <a-row v-for="(item2,index2) of item1.goodsList" v-bind:key="item2.goodsID">
-                  <a-col :md="6" :sm="24">{{item2.orderNumber}}.{{item2.goodsName}}</a-col>
-                  <a-col :md="3" :sm="24">/{{item2.goodsUnit}}</a-col>
-                  <a-col :md="5" :sm="24">
-                    <span v-show="item2.currentNum>0" style="font-size: 17px;font-weight: bold;color: red">已选择</span>
-                  </a-col>
-                  <a-col :md="10" :sm="24">
-                    <a-input-number :id="item2.goodsID" :defaultValue="1" :min="1" style="width:70px;height:100%" />
-                    <a-icon type="plus"  style="cursor: pointer;font-size: 24px;color: mediumspringgreen"  @click="addGoods(item2,index1,index2)"/>
-                  </a-col>
+                <a-row
+                  v-for="(item2,index2) of item1.goodsList"
+                  v-bind:key="item2.goodsID"
+                  :id="index1+'goodsRow'+index2"
+                >
+                  <div
+                    @mouseover="overGoods(item2,index1,index2)"
+                    @mouseout="outGoods(item2,index1,index2)"
+                  >
+                    <a-col :md="9" :sm="24"><span style="font-weight:bold">{{item2.orderNumber}}.</span>{{item2.goodsName}}</a-col>
+                    <a-col :md="3" :sm="24">/{{item2.goodsUnit}}</a-col>
+                    <a-col :md="5" :sm="24">
+                      <!--                    <span v-show="item2.currentNum>0" style="font-size: 17px;font-weight: bold;color: red">已选择</span>-->
+                      <img style="width:25px;height: 25px" v-show="item2.currentNum>0" :src="selectImg"/>
+                    </a-col>
+                    <a-col :md="7" :sm="24">
+                      <a-input-number :id="item2.goodsID" :defaultValue="1" :min="1" style="width:70px;height:100%" />
+                      <a-icon type="plus"  style="cursor: pointer;font-size: 24px;color: mediumspringgreen"  @click="addGoods(item2,index1,index2)"/>
+                    </a-col>
+                  </div>
                 </a-row>
               </a-collapse-panel>
             </a-collapse>
@@ -79,6 +105,7 @@ import {
   returnGoodsInsert,
   returnGoodsList
 } from '@/api/goods'
+import $ from 'jquery'
 import {
   categoryGoodsList
 } from '@/api/category'
@@ -111,6 +138,7 @@ export default {
       loadingReturnGoods:false,
       categoryGoodsList:[],
       activeKey: ['0'],
+      selectImg:require('../../../assets/isSelected.png')
     }
   },
   created () {
@@ -167,6 +195,7 @@ export default {
       goodsList.goodsList[index2].currentNum = 0
       this.$set(this.categoryGoodsList,index1,goodsList)
       this.data.splice(index,1)
+      $('#'+index1+'goodsRow'+index2).removeClass('selected_goodsRow')
     },
     ok(){
       if (!this.data){
@@ -223,6 +252,60 @@ export default {
           this.loadingReturnGoods = false
         })
     },
+    over(item,index){
+      $('#row'+index).addClass('selected_row')
+      let index1 = -1
+      let index2 = -1
+      for (let i =0;i<this.categoryGoodsList.length;i++){
+        for (let n=0;n<this.categoryGoodsList[i].goodsList.length;n++){
+          const obj = this.categoryGoodsList[i].goodsList[n]
+          if (obj.goodsID === item.goodsDetailID){
+            index1 = i
+            index2 = n
+            break
+          }
+        }
+      }
+      $('#'+index1+'goodsRow'+index2).addClass('selected_goodsRow')
+    },
+    out(item,index){
+      $('#row'+index).removeClass('selected_row')
+      let index1 = -1
+      let index2 = -1
+      for (let i =0;i<this.categoryGoodsList.length;i++){
+        for (let n=0;n<this.categoryGoodsList[i].goodsList.length;n++){
+          const obj = this.categoryGoodsList[i].goodsList[n]
+          if (obj.goodsID === item.goodsDetailID){
+            index1 = i
+            index2 = n
+            break
+          }
+        }
+      }
+      $('#'+index1+'goodsRow'+index2).removeClass('selected_goodsRow')
+    },
+    overGoods(item,index1,index2){
+      let index = -1
+      for (let i =0;i<this.data.length;i++){
+        if (item.goodsID === this.data[i].goodsDetailID){
+          index = i
+          break
+        }
+      }
+      $('#row'+index).addClass('selected_row')
+      $('#'+index1+'goodsRow'+index2).addClass('selected_goodsRow')
+    },
+    outGoods(item,index1,index2){
+      let index = -1
+      for (let i =0;i<this.data.length;i++){
+        if (item.goodsID === this.data[i].goodsDetailID){
+          index = i
+          break
+        }
+      }
+      $('#row'+index).removeClass('selected_row')
+      $('#'+index1+'goodsRow'+index2).removeClass('selected_goodsRow')
+    }
   }
 }
 </script>
@@ -230,5 +313,11 @@ export default {
 <style scoped>
   /deep/ .ant-input-number{
     width: 100px!important;
+  }
+  .selected_row{
+    background-color: #e2e2e2;
+  }
+  .selected_goodsRow{
+    background-color: #e2e2e2;
   }
 </style>

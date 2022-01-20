@@ -30,7 +30,7 @@
             <a-collapse v-model="activeKey">
               <a-collapse-panel v-for="(item1,index1) of categoryGoodsList" v-bind:key="item1.name" :key="item1.title" :header="item1.title">
                   <a-row v-for="(item2,index2) of item1.goodsList" v-bind:key="item2.goodsID">
-                    <a-col :md="4" :sm="24">{{item2.orderNumber}}.{{item2.goodsName}}</a-col>
+                    <a-col :md="4" :sm="24"><span style="font-weight:bold">{{item2.orderNumber}}.</span>{{item2.goodsName}}</a-col>
                     <a-col :md="4" :sm="24">{{item2.goodsPrice}}元/{{item2.goodsUnit}}</a-col>
                     <a-col :md="4" :sm="24" style="color: red">折扣：{{item2.goodsSale}}</a-col>
 <!--                    <a-col :md="4" :sm="24">x{{item2.goodsNumber}}</a-col>-->
@@ -246,4 +246,5 @@ export default {
   /deep/ .ant-input-number-input{
     height: 100%;
   }
+
 </style>

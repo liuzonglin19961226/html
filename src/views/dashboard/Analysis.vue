@@ -92,22 +92,20 @@
       <div class="salesCard">
         <a-tabs default-active-key="1" size="large" :tab-bar-style="{marginBottom: '24px', paddingLeft: '16px'}">
           <div class="extra-wrapper" slot="tabBarExtraContent">
-            <div class="extra-item">
+            <!--<div class="extra-item">
               <a @click="searchRankList('day')">{{ $t('dashboard.analysis.all-day') }}</a>
               <a @click="searchRankList('week')">{{ $t('dashboard.analysis.all-week') }}</a>
               <a @click="searchRankList('month')">{{ $t('dashboard.analysis.all-month') }}</a>
               <a @click="searchRankList('year')">{{ $t('dashboard.analysis.all-year') }}</a>
             </div>
-            <a-range-picker :style="{width: '256px'}" />
+            <a-range-picker :style="{width: '256px'}" />-->
           </div>
           <a-tab-pane loading="true" :tab="$t('dashboard.analysis.sales')" key="1">
             <a-row>
-              <a-col :xl="16" :lg="12" :md="12" :sm="24" :xs="24">
-                <bar :data="barData" :title="$t('dashboard.analysis.sales-trend')" />
-              </a-col>
-              <a-col :xl="8" :lg="12" :md="12" :sm="24" :xs="24">
+              <bar :data="barData" :title="$t('dashboard.analysis.sales-trend')" />
+             <!-- <a-col :xl="8" :lg="12" :md="12" :sm="24" :xs="24">
                 <rank-list title="菜品出售排名" :list="rankList"/>
-              </a-col>
+              </a-col>-->
             </a-row>
           </a-tab-pane>
           <!--<a-tab-pane :tab="$t('dashboard.analysis.visits')" key="2">
@@ -341,18 +339,6 @@
         searchData,
 
         barData : [
-          {x : '1月',y : 12000},
-          {x : '2月',y : 10000},
-          {x : '3月',y : 21000},
-          {x : '4月',y : 14000},
-          {x : '5月',y : 13400},
-          {x : '6月',y : 12000},
-          {x : '7月',y : 12000},
-          {x : '8月',y : 12000},
-          {x : '9月',y : 12000},
-          {x : '10月',y : 12000},
-          {x : '11月',y : 12000},
-          {x : '12月',y : 12000}
         ],
         barData2 : [],
 
@@ -421,15 +407,19 @@
 
               for (let i=0 ; i<res.data.getLastSevenData.length; i++){
                 const obj = res.data.getLastSevenData[i]
-                this.saleNumber.push({x:obj.goodsNum,y:obj.time})
+                this.saleNumber.push({y:obj.goodsNum,x:obj.time})
               }
               for (let i=0 ; i<res.data.getLastSevenData.length; i++){
                 const obj = res.data.getLastSevenData[i]
-                this.orderPay.push({x:obj.num,y:obj.time})
+                this.orderPay.push({y:obj.num,x:obj.time})
               }
               for (let i=0 ; i<res.data.getLastSevenData.length; i++){
                 const obj = res.data.getLastSevenData[i]
-                this.orderPrice.push({x:obj.orderPrice,y:obj.time})
+                this.orderPrice.push({y:obj.orderPrice,x:obj.time})
+              }
+              for (let i=0 ; i<res.data.getLastSevenMonthData.length; i++){
+                const obj = res.data.getLastSevenMonthData[i]
+                this.barData.push({y:obj.orderPrice,x:obj.time})
               }
             }
           )
